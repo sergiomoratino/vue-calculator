@@ -1,12 +1,15 @@
 <template>
   <div
     class="p-3"
-    style="max-width: 400px; margin: 50px auto; background: #234"
+    style="max-width: 300px; margin: 40px auto; background: #222"
   >
     <div class="w-full roundend m1 p-3 text-white">{{ value || 0 }}</div>
     <div class="row no-gutters">
       <div class="col-3" v-for="element in elements" :key="element">
-        <div class="lead text-white text-center m-1 py-3 rounded buttons-class">
+        <div
+          class="lead text-white text-center m-1 py-3 rounded buttons-class"
+          @click="pressed(element)"
+        >
           {{ element }}
         </div>
       </div>
@@ -38,7 +41,40 @@ export default {
         0,
         '.',
       ],
+      operator: null,
+      previousValue: '',
     };
+  },
+  methods: {
+    pressed(e) {
+      if (!isNaN(e) || e === '.') {
+        this.value += e + '';
+      }
+      if (e === 'C') {
+        this.value = '';
+      }
+      if (e === '%') {
+        this.value = this.value / 100 + '';
+      }
+      if (['/', '*', '-', '+'].includes(e)) {
+        this.operator = e;
+        try {
+            this.previousValue = this.value;
+        } catch (err) {
+            console.error(err);
+        }
+        this.value = '';
+      }
+      if (e === '=') {
+        try {
+            this.value = eval(this.previousValue + this.operator + this.value);
+        } catch (err) {
+            console.error(err);
+        }
+        this.previousValue = '';
+        this.operator = null;
+      }
+    },
   },
 };
 </script>
